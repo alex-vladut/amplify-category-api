@@ -4,7 +4,7 @@ export async function enableAdminUI(appId: string, envName: string, region: stri
   console.log('inside enable Admin UI');
   const setupAdminUIJobDetails = await setupAmplifyAdminUI(appId, region);
   console.log(setupAdminUIJobDetails);
-  const jobCompletionDetails = await pollUntilDone(setupAdminUIJobDetails.JobId, appId, envName, region, 2 * 1000, 2000 * 1000);
+  const jobCompletionDetails = await pollUntilDone(setupAdminUIJobDetails.JobId, appId, setupAdminUIJobDetails.BackendEnvironmentName , region, 2 * 1000, 2000 * 1000);
   console.log('after polling');
   console.log(setupAdminUIJobDetails);
   if (jobCompletionDetails.Status === 'FAILED') {
