@@ -74,8 +74,7 @@ const USE_PARENT_ACCOUNT = [
   'api-key-migration3',
   'api-key-migration4',
   'api-key-migration5',
-  'searchable-migration',
-  'api_2'
+  'searchable-migration'
 ];
 
 // This array needs to be update periodically when new tests suites get added
@@ -206,7 +205,8 @@ function splitTests(
   const output: CircleCIConfig = { ...config };
   const jobs = { ...config.jobs };
   const job = jobs[jobName];
-  const testSuites = getTestFiles(jobRootDir);
+  // const testSuites = getTestFiles(jobRootDir);
+  const testSuites = ['src/__tests__/api_2.test.ts'];
 
   const newJobs = testSuites.reduce((acc, suite, index) => {
     const newJobName = generateJobName(jobName, suite);
@@ -413,6 +413,7 @@ function main(): void {
     join(repoRoot, 'packages', 'amplify-e2e-tests'),
     CONCURRENCY,
   );
+  /*
   const splitGqlTests = splitTests(
     splitPkgTests,
     'graphql_e2e_tests',
@@ -436,7 +437,8 @@ function main(): void {
     CONCURRENCY,
     true,
   );
-  saveConfig(splitV6MigrationTests);
+  */
+  saveConfig(splitPkgTests);
   verifyConfig();
 }
 main();
