@@ -322,6 +322,8 @@ export const setupAmplifyAdminUI = async (appId: string, region: string) => {
 
 export const getAmplifyBackendJobStatus = async (jobId: string, appId: string, envName: string, region: string) => {
   const amplifyBackend = new AmplifyBackend({ region });
+  console.log('inside getAmplifyBackendJobStatus');
+  console.log(jobId + ' ' + appId + ' ' + envName);
 
   return await amplifyBackend
     .getBackendJob({

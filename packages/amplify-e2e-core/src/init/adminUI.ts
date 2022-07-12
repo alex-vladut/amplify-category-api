@@ -1,10 +1,12 @@
 import { setupAmplifyAdminUI, getAmplifyBackendJobStatus } from '../utils/sdk-calls';
 
 export async function enableAdminUI(appId: string, envName: string, region: string) {
+  console.log('inside enable Admin UI');
   const setupAdminUIJobDetails = await setupAmplifyAdminUI(appId, region);
-
+  console.log(setupAdminUIJobDetails);
   const jobCompletionDetails = await pollUntilDone(setupAdminUIJobDetails.JobId, appId, envName, region, 2 * 1000, 2000 * 1000);
-
+  console.log('after polling');
+  console.log(setupAdminUIJobDetails);
   if (jobCompletionDetails.Status === 'FAILED') {
     throw new Error('Setting up Amplify Studio failed');
   }
@@ -17,6 +19,8 @@ async function pollUntilDone(jobId: string, appId: string, envName: string, regi
   const start = Date.now();
   while (true) {
     const jobDetails = await getAmplifyBackendJobStatus(jobId, appId, envName, region);
+    console.log('polling');
+    console.log(jobDetails);
 
     if (jobDetails.Status === 'FAILED' || jobDetails.Status === 'COMPLETED') {
       // we know we're done here, return from here whatever you
