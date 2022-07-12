@@ -44,127 +44,127 @@ describe('amplify add api (GraphQL)', () => {
     deleteProjectDir(projRoot);
   });
 
-  it('init a project with conflict detection enabled and a schema with @key, test update mutation', async () => {
-    const name = 'keyconflictdetection';
-    await initJSProjectWithProfile(projRoot, { name });
-    await addApiWithBlankSchemaAndConflictDetection(projRoot, { transformerVersion: 1 });
-    await updateApiSchema(projRoot, name, 'key-conflict-detection.graphql');
-    await amplifyPush(projRoot);
+  // it('init a project with conflict detection enabled and a schema with @key, test update mutation', async () => {
+  //   const name = 'keyconflictdetection';
+  //   await initJSProjectWithProfile(projRoot, { name });
+  //   await addApiWithBlankSchemaAndConflictDetection(projRoot, { transformerVersion: 1 });
+  //   await updateApiSchema(projRoot, name, 'key-conflict-detection.graphql');
+  //   await amplifyPush(projRoot);
 
-    const meta = getProjectMeta(projRoot);
-    const region = meta.providers[providerName].Region as string;
-    const { output } = meta.api[name];
-    const url = output.GraphQLAPIEndpointOutput as string;
-    const apiKey = output.GraphQLAPIKeyOutput as string;
+  //   const meta = getProjectMeta(projRoot);
+  //   const region = meta.providers[providerName].Region as string;
+  //   const { output } = meta.api[name];
+  //   const url = output.GraphQLAPIEndpointOutput as string;
+  //   const apiKey = output.GraphQLAPIKeyOutput as string;
 
-    const appSyncClient = new AWSAppSyncClient({
-      url,
-      region,
-      disableOffline: true,
-      auth: {
-        type: AUTH_TYPE.API_KEY,
-        apiKey,
-      },
-    });
+  //   const appSyncClient = new AWSAppSyncClient({
+  //     url,
+  //     region,
+  //     disableOffline: true,
+  //     auth: {
+  //       type: AUTH_TYPE.API_KEY,
+  //       apiKey,
+  //     },
+  //   });
 
-    const createMutation = /* GraphQL */ `
-      mutation CreateNote($input: CreateNoteInput!, $condition: ModelNoteConditionInput) {
-        createNote(input: $input, condition: $condition) {
-          noteId
-          note
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-    const createInput = {
-      input: {
-        noteId: '1',
-        note: 'initial note',
-      },
-    };
-    const createResult: any = await appSyncClient.mutate({
-      mutation: gql(createMutation),
-      fetchPolicy: 'no-cache',
-      variables: createInput,
-    });
+  //   const createMutation = /* GraphQL */ `
+  //     mutation CreateNote($input: CreateNoteInput!, $condition: ModelNoteConditionInput) {
+  //       createNote(input: $input, condition: $condition) {
+  //         noteId
+  //         note
+  //         _version
+  //         _deleted
+  //         _lastChangedAt
+  //         createdAt
+  //         updatedAt
+  //       }
+  //     }
+  //   `;
+  //   const createInput = {
+  //     input: {
+  //       noteId: '1',
+  //       note: 'initial note',
+  //     },
+  //   };
+  //   const createResult: any = await appSyncClient.mutate({
+  //     mutation: gql(createMutation),
+  //     fetchPolicy: 'no-cache',
+  //     variables: createInput,
+  //   });
 
-    const updateMutation = /* GraphQL */ `
-      mutation UpdateNote($input: UpdateNoteInput!, $condition: ModelNoteConditionInput) {
-        updateNote(input: $input, condition: $condition) {
-          noteId
-          note
-          _version
-          _deleted
-          _lastChangedAt
-          createdAt
-          updatedAt
-        }
-      }
-    `;
-    const createResultData = createResult.data as any;
-    const updateInput = {
-      input: {
-        noteId: createResultData.createNote.noteId,
-        note: 'note updated',
-        _version: createResultData.createNote._version,
-      },
-    };
+  //   const updateMutation = /* GraphQL */ `
+  //     mutation UpdateNote($input: UpdateNoteInput!, $condition: ModelNoteConditionInput) {
+  //       updateNote(input: $input, condition: $condition) {
+  //         noteId
+  //         note
+  //         _version
+  //         _deleted
+  //         _lastChangedAt
+  //         createdAt
+  //         updatedAt
+  //       }
+  //     }
+  //   `;
+  //   const createResultData = createResult.data as any;
+  //   const updateInput = {
+  //     input: {
+  //       noteId: createResultData.createNote.noteId,
+  //       note: 'note updated',
+  //       _version: createResultData.createNote._version,
+  //     },
+  //   };
 
-    const updateResult: any = await appSyncClient.mutate({
-      mutation: gql(updateMutation),
-      fetchPolicy: 'no-cache',
-      variables: updateInput,
-    });
-    const updateResultData = updateResult.data as any;
+  //   const updateResult: any = await appSyncClient.mutate({
+  //     mutation: gql(updateMutation),
+  //     fetchPolicy: 'no-cache',
+  //     variables: updateInput,
+  //   });
+  //   const updateResultData = updateResult.data as any;
 
-    expect(updateResultData).toBeDefined();
-    expect(updateResultData.updateNote).toBeDefined();
-    expect(updateResultData.updateNote.noteId).toEqual(createResultData.createNote.noteId);
-    expect(updateResultData.updateNote.note).not.toEqual(createResultData.createNote.note);
-    expect(updateResultData.updateNote._version).not.toEqual(createResultData.createNote._version);
-    expect(updateResultData.updateNote.note).toEqual(updateInput.input.note);
-  });
+  //   expect(updateResultData).toBeDefined();
+  //   expect(updateResultData.updateNote).toBeDefined();
+  //   expect(updateResultData.updateNote.noteId).toEqual(createResultData.createNote.noteId);
+  //   expect(updateResultData.updateNote.note).not.toEqual(createResultData.createNote.note);
+  //   expect(updateResultData.updateNote._version).not.toEqual(createResultData.createNote._version);
+  //   expect(updateResultData.updateNote.note).toEqual(updateInput.input.note);
+  // });
 
-  it('init a project with conflict detection enabled and toggle disable', async () => {
-    const name = 'conflictdetection';
-    await initJSProjectWithProfile(projRoot, { name });
-    await addApiWithBlankSchemaAndConflictDetection(projRoot, { transformerVersion: 1 });
-    await updateApiSchema(projRoot, name, 'simple_model.graphql');
+  // it('init a project with conflict detection enabled and toggle disable', async () => {
+  //   const name = 'conflictdetection';
+  //   await initJSProjectWithProfile(projRoot, { name });
+  //   await addApiWithBlankSchemaAndConflictDetection(projRoot, { transformerVersion: 1 });
+  //   await updateApiSchema(projRoot, name, 'simple_model.graphql');
 
-    await amplifyPush(projRoot);
+  //   await amplifyPush(projRoot);
 
-    const meta = getProjectMeta(projRoot);
-    const { output } = meta.api[name];
-    const { GraphQLAPIIdOutput, GraphQLAPIEndpointOutput, GraphQLAPIKeyOutput } = output;
-    const { graphqlApi } = await getAppSyncApi(GraphQLAPIIdOutput, meta.providers.awscloudformation.Region);
+  //   const meta = getProjectMeta(projRoot);
+  //   const { output } = meta.api[name];
+  //   const { GraphQLAPIIdOutput, GraphQLAPIEndpointOutput, GraphQLAPIKeyOutput } = output;
+  //   const { graphqlApi } = await getAppSyncApi(GraphQLAPIIdOutput, meta.providers.awscloudformation.Region);
 
-    expect(GraphQLAPIIdOutput).toBeDefined();
-    expect(GraphQLAPIEndpointOutput).toBeDefined();
-    expect(GraphQLAPIKeyOutput).toBeDefined();
+  //   expect(GraphQLAPIIdOutput).toBeDefined();
+  //   expect(GraphQLAPIEndpointOutput).toBeDefined();
+  //   expect(GraphQLAPIKeyOutput).toBeDefined();
 
-    expect(graphqlApi).toBeDefined();
-    expect(graphqlApi.apiId).toEqual(GraphQLAPIIdOutput);
+  //   expect(graphqlApi).toBeDefined();
+  //   expect(graphqlApi.apiId).toEqual(GraphQLAPIIdOutput);
 
-    const transformConfig = getTransformConfig(projRoot, name);
-    expect(transformConfig).toBeDefined();
-    expect(transformConfig.Version).toBeDefined();
-    expect(transformConfig.Version).toEqual(TRANSFORM_CURRENT_VERSION);
-    expect(transformConfig.ResolverConfig).toBeDefined();
-    expect(transformConfig.ResolverConfig.project).toBeDefined();
-    expect(transformConfig.ResolverConfig.project.ConflictDetection).toEqual('VERSION');
-    expect(transformConfig.ResolverConfig.project.ConflictHandler).toEqual('AUTOMERGE');
+  //   const transformConfig = getTransformConfig(projRoot, name);
+  //   expect(transformConfig).toBeDefined();
+  //   expect(transformConfig.Version).toBeDefined();
+  //   expect(transformConfig.Version).toEqual(TRANSFORM_CURRENT_VERSION);
+  //   expect(transformConfig.ResolverConfig).toBeDefined();
+  //   expect(transformConfig.ResolverConfig.project).toBeDefined();
+  //   expect(transformConfig.ResolverConfig.project.ConflictDetection).toEqual('VERSION');
+  //   expect(transformConfig.ResolverConfig.project.ConflictHandler).toEqual('AUTOMERGE');
 
-    // remove datastore feature
-    await apiDisableDataStore(projRoot, {});
-    await amplifyPushUpdate(projRoot);
-    const disableDSConfig = getTransformConfig(projRoot, name);
-    expect(disableDSConfig).toBeDefined();
-    expect(_.isEmpty(disableDSConfig.ResolverConfig)).toBe(true);
-  });
+  //   // remove datastore feature
+  //   await apiDisableDataStore(projRoot, {});
+  //   await amplifyPushUpdate(projRoot);
+  //   const disableDSConfig = getTransformConfig(projRoot, name);
+  //   expect(disableDSConfig).toBeDefined();
+  //   expect(_.isEmpty(disableDSConfig.ResolverConfig)).toBe(true);
+  // });
 
   it('init a project with conflict detection enabled and admin UI enabled to generate datastore models in the cloud', async () => {
     const name = 'dsadminui';
@@ -200,7 +200,7 @@ describe('amplify add api (GraphQL)', () => {
     expect(graphqlApi).toBeDefined();
     expect(graphqlApi.apiId).toEqual(GraphQLAPIIdOutput);
   });
-
+/*
   it('init a sync enabled project and update conflict resolution strategy', async () => {
     const name = 'syncenabled';
     await initJSProjectWithProfile(projRoot, { name });
@@ -238,4 +238,5 @@ describe('amplify add api (GraphQL)', () => {
     expect(graphqlApi).toBeDefined();
     expect(graphqlApi.apiId).toEqual(GraphQLAPIIdOutput);
   });
+  */
 });
