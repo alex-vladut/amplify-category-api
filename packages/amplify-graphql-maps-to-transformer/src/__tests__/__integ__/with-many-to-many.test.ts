@@ -6,6 +6,7 @@ import { IndexTransformer } from '@aws-amplify/graphql-index-transformer';
 import { AuthTransformer } from '@aws-amplify/graphql-auth-transformer';
 import { ObjectTypeDefinitionNode, parse } from 'graphql';
 import { expectedResolversForModelWithRenamedField } from './common';
+import { featureFlags } from '../../../../amplify-graphql-auth-transformer/src/__tests__/test-helpers';
 
 const manyToManyMapped = /* GraphQL */ `
   type Employee @model @mapsTo(name: "Person") {
@@ -26,6 +27,7 @@ const transformSchema = (schema: string) => {
   const hasOneTransformer = new HasOneTransformer();
   const authTransformer = new AuthTransformer();
   const transformer = new GraphQLTransform({
+    featureFlags,
     transformers: [
       modelTransformer,
       indexTransformer,
